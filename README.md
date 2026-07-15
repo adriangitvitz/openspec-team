@@ -23,7 +23,7 @@ openspec validate <change> --refresh-fingerprints
 ## Install
 
 ```bash
-go install github.com/adriangitvitz/openspec-go/cmd/openspec@latest
+go install github.com/adriangitvitz/openspec-team/cmd/openspec@latest
 ```
 
 Or build from source:
