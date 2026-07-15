@@ -9,9 +9,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/adriangitvitz/openspec-go/internal/change"
-	"github.com/adriangitvitz/openspec-go/internal/core"
-	"github.com/adriangitvitz/openspec-go/internal/merge"
+	"github.com/adriangitvitz/openspec-team/internal/change"
+	"github.com/adriangitvitz/openspec-team/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/merge"
 )
 
 // captureFingerprints is best-effort: fingerprint capture must never break the command.

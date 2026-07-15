@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/adriangitvitz/openspec-go/internal/parser"
+	"github.com/adriangitvitz/openspec-team/internal/parser"
 )
 
 const baseSpec = `# auth Specification

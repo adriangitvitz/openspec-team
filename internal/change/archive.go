@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/adriangitvitz/openspec-go/internal/core"
-	"github.com/adriangitvitz/openspec-go/internal/fsutil"
-	"github.com/adriangitvitz/openspec-go/internal/merge"
-	"github.com/adriangitvitz/openspec-go/internal/parser"
-	"github.com/adriangitvitz/openspec-go/internal/validate"
+	"github.com/adriangitvitz/openspec-team/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/fsutil"
+	"github.com/adriangitvitz/openspec-team/internal/merge"
+	"github.com/adriangitvitz/openspec-team/internal/parser"
+	"github.com/adriangitvitz/openspec-team/internal/validate"
 )
 
 // ArchiveOptions configure Archive.

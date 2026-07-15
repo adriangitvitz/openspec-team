@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/adriangitvitz/openspec-go/internal/core"
-	"github.com/adriangitvitz/openspec-go/internal/fsutil"
+	"github.com/adriangitvitz/openspec-team/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/fsutil"
 )
 
 //go:embed assets

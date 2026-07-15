@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/adriangitvitz/openspec-go/internal/schema"
+	"github.com/adriangitvitz/openspec-team/internal/schema"
 )
 
 const exportDelta = `## ADDED Requirements

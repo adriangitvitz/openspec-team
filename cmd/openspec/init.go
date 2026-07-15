@@ -8,9 +8,9 @@ import (
 	"github.com/goccy/go-yaml"
 	"github.com/spf13/cobra"
 
-	"github.com/adriangitvitz/openspec-go/internal/agents"
-	"github.com/adriangitvitz/openspec-go/internal/core"
-	"github.com/adriangitvitz/openspec-go/internal/schema"
+	"github.com/adriangitvitz/openspec-team/internal/agents"
+	"github.com/adriangitvitz/openspec-team/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/schema"
 )
 
 func targetPath(args []string) (string, error) {

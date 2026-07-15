@@ -6,9 +6,9 @@ import (
 	"sort"
 	"time"
 
-	"github.com/adriangitvitz/openspec-go/internal/core"
-	"github.com/adriangitvitz/openspec-go/internal/parser"
-	"github.com/adriangitvitz/openspec-go/internal/schema"
+	"github.com/adriangitvitz/openspec-team/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/parser"
+	"github.com/adriangitvitz/openspec-team/internal/schema"
 )
 
 // ChangeSummary is one row of `openspec list --json`.

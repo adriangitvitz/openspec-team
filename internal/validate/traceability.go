@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/adriangitvitz/openspec-go/internal/parser"
-	"github.com/adriangitvitz/openspec-go/internal/schema"
+	"github.com/adriangitvitz/openspec-team/internal/parser"
+	"github.com/adriangitvitz/openspec-team/internal/schema"
 )
 
 // Tasks reference requirements with inline `(req: <name>)` markers; names cannot

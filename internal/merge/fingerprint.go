@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/adriangitvitz/openspec-go/internal/fsutil"
-	"github.com/adriangitvitz/openspec-go/internal/parser"
+	"github.com/adriangitvitz/openspec-team/internal/fsutil"
+	"github.com/adriangitvitz/openspec-team/internal/parser"
 )
 
 // Fingerprints hash base requirements at capture time; a mismatch at archive blocks instead of silently clobbering.

@@ -3,7 +3,7 @@ package change
 import (
 	"path/filepath"
 
-	"github.com/adriangitvitz/openspec-go/internal/schema"
+	"github.com/adriangitvitz/openspec-team/internal/schema"
 )
 
 // ArtifactStatus is one artifact's workflow state.

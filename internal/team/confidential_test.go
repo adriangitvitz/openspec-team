@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/adriangitvitz/openspec-go/internal/change"
+	"github.com/adriangitvitz/openspec-team/internal/change"
 )
 
 func confidentialFixture(t *testing.T) *change.Context {

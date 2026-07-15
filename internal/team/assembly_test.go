@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/adriangitvitz/openspec-go/internal/change"
+	"github.com/adriangitvitz/openspec-team/internal/change"
 )
 
 func writeFile(t *testing.T, root, rel, content string) {

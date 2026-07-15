@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/adriangitvitz/openspec-go/internal/fsutil"
+	"github.com/adriangitvitz/openspec-team/internal/fsutil"
 )
 
 // WriteArtifactOutput persists a persona run's output to the artifact path,

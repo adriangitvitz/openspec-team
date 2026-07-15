@@ -10,7 +10,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/adriangitvitz/openspec-go/internal/parser"
+	"github.com/adriangitvitz/openspec-team/internal/parser"
 )
 
 // Level is an issue severity.

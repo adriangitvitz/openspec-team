@@ -2,7 +2,7 @@
 name: opsx-senior-engineer
 description: Senior Engineer persona for the team-driven OpenSpec workflow. Evaluates technology and code options, authors the technical design with rationale, adversarially reviews the specs for design soundness and the task plan before implementation. Authors design.md; reviews specs/ and tasks.md.
 metadata:
-  generatedBy: openspec-go
+  generatedBy: openspec-team
   version: "{{.Version}}"
 ---
 

@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/adriangitvitz/openspec-go/internal/change"
-	"github.com/adriangitvitz/openspec-go/internal/core"
-	"github.com/adriangitvitz/openspec-go/internal/validate"
+	"github.com/adriangitvitz/openspec-team/internal/change"
+	"github.com/adriangitvitz/openspec-team/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/validate"
 )
 
 type validationResult struct {

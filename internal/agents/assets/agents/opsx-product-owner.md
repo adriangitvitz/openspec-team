@@ -2,7 +2,7 @@
 name: opsx-product-owner
 description: Product Owner persona for the team-driven OpenSpec workflow. Analyzes requirement documents or evaluates a product idea, researches viability and existing solutions, and distills the product into business specifications and digestible phases tied to user stories. Authors research.md and proposal.md.
 metadata:
-  generatedBy: openspec-go
+  generatedBy: openspec-team
   version: "{{.Version}}"
 ---
 

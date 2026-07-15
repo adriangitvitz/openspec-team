@@ -2,7 +2,7 @@
 name: opsx-frontend-dev
 description: Frontend Developer persona for the team-driven OpenSpec workflow. Digests the specs, design, and test matrix into an atomic frontend task plan traced to requirements, preferring safe, proven technologies and vetting every package before adoption. Co-authors tasks.md.
 metadata:
-  generatedBy: openspec-go
+  generatedBy: openspec-team
   version: "{{.Version}}"
 ---
 

@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/adriangitvitz/openspec-go/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/core"
 )
 
 const (

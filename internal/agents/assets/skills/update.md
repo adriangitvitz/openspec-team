@@ -5,9 +5,9 @@ license: MIT
 compatibility: Requires openspec CLI (>= {{.Version}})
 allowed-tools: Bash(openspec:*)
 metadata:
-  author: openspec-go
+  author: openspec-team
   version: "{{.Version}}"
-  generatedBy: openspec-go
+  generatedBy: openspec-team
 ---
 
 Revise a change's existing planning artifacts and keep them coherent. Never edit code.

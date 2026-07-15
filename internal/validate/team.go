@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/adriangitvitz/openspec-go/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/core"
 )
 
 // TeamConfigReport wraps TeamConfigIssues into a Report; false when there is no

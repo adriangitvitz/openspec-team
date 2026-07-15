@@ -2,7 +2,7 @@
 name: opsx-qa
 description: QA Engineer persona for the team-driven OpenSpec workflow. Derives a test matrix (scenario x test type x priority) from the delta-spec scenarios or analyzes coverage against a user-referenced matrix, and reviews specs for testability. Authors test-matrix.md; reviews specs/.
 metadata:
-  generatedBy: openspec-go
+  generatedBy: openspec-team
   version: "{{.Version}}"
 ---
 

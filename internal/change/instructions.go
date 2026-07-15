@@ -7,9 +7,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/adriangitvitz/openspec-go/internal/core"
-	"github.com/adriangitvitz/openspec-go/internal/parser"
-	"github.com/adriangitvitz/openspec-go/internal/schema"
+	"github.com/adriangitvitz/openspec-team/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/parser"
+	"github.com/adriangitvitz/openspec-team/internal/schema"
 )
 
 // DependencyInfo is one dependency of an artifact, with completion state.

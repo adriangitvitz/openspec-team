@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/adriangitvitz/openspec-go/internal/fsutil"
+	"github.com/adriangitvitz/openspec-team/internal/fsutil"
 )
 
 // NeedsExitCode is the exit code for a structured pause: fulfill the pending extraction requests and re-run.

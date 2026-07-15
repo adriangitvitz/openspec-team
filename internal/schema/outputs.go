@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/adriangitvitz/openspec-go/internal/fsutil"
+	"github.com/adriangitvitz/openspec-team/internal/fsutil"
 )
 
 // ResolveArtifactOutputs resolves a generates path or glob to existing files under changeDir.

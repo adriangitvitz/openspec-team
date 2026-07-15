@@ -1,4 +1,4 @@
-module github.com/adriangitvitz/openspec-go
+module github.com/adriangitvitz/openspec-team
 
 go 1.25.1
 

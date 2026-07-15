@@ -5,9 +5,9 @@ license: MIT
 compatibility: Requires openspec CLI (>= {{.Version}})
 allowed-tools: Bash(openspec:*), Task
 metadata:
-  author: openspec-go
+  author: openspec-team
   version: "{{.Version}}"
-  generatedBy: openspec-go
+  generatedBy: openspec-team
 ---
 
 Drive a change through the team-driven workflow: personas author and review each artifact, the user approves at phase gates.

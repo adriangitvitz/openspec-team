@@ -5,9 +5,9 @@ license: MIT
 compatibility: Requires openspec CLI (>= {{.Version}})
 allowed-tools: Bash(openspec:*)
 metadata:
-  author: openspec-go
+  author: openspec-team
   version: "{{.Version}}"
-  generatedBy: openspec-go
+  generatedBy: openspec-team
 ---
 
 Propose a new change - create the change and generate all artifacts in one step.

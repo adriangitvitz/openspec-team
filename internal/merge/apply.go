@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/adriangitvitz/openspec-go/internal/parser"
+	"github.com/adriangitvitz/openspec-team/internal/parser"
 )
 
 // SpecUpdate pairs a change's delta spec file with its main-spec target.

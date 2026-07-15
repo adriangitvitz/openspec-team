@@ -2,7 +2,7 @@
 name: opsx-backend-dev
 description: Backend Developer persona for the team-driven OpenSpec workflow. Digests the specs, design, and test matrix into an atomic backend task plan traced to requirements, justifying each decision to the senior engineer. Co-authors tasks.md.
 metadata:
-  generatedBy: openspec-go
+  generatedBy: openspec-team
   version: "{{.Version}}"
 ---
 

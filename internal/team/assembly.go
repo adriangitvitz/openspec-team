@@ -13,10 +13,10 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/adriangitvitz/openspec-go/internal/agents"
-	"github.com/adriangitvitz/openspec-go/internal/change"
-	"github.com/adriangitvitz/openspec-go/internal/core"
-	"github.com/adriangitvitz/openspec-go/internal/schema"
+	"github.com/adriangitvitz/openspec-team/internal/agents"
+	"github.com/adriangitvitz/openspec-team/internal/change"
+	"github.com/adriangitvitz/openspec-team/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/schema"
 )
 
 const (

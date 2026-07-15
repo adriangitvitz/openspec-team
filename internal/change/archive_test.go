@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/adriangitvitz/openspec-go/internal/core"
-	"github.com/adriangitvitz/openspec-go/internal/merge"
+	"github.com/adriangitvitz/openspec-team/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/merge"
 )
 
 const archBaseSpec = `# auth Specification

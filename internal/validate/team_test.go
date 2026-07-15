@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/adriangitvitz/openspec-go/internal/core"
+	"github.com/adriangitvitz/openspec-team/internal/core"
 )
 
 func TestTeamConfigValid(t *testing.T) {

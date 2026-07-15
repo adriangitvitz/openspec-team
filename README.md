@@ -1,4 +1,4 @@
-# openspec-go
+# openspec-team
 
 A lean Go implementation of [OpenSpec](https://github.com/Fission-AI/OpenSpec): spec-driven development for AI coding agents. Single static binary, Claude Code and Crush integration, and one significant improvement over the original: archive-time conflict detection.
 
@@ -10,7 +10,7 @@ OpenSpec keeps you and your AI agent honest: requirements live in structured mar
 
 The original has a documented flaw: a `MODIFIED` delta is a whole-requirement replacement, so when two changes touch the same requirement, the second archive silently clobbers the first.
 
-openspec-go records a sha256 fingerprint of every base requirement a change references (captured automatically when the skills run `status`/`validate`, stored in the change's `meta.json`). At archive time, if the base spec no longer matches the fingerprint, the archive blocks with no partial writes and tells the agent how to recover:
+openspec-team records a sha256 fingerprint of every base requirement a change references (captured automatically when the skills run `status`/`validate`, stored in the change's `meta.json`). At archive time, if the base spec no longer matches the fingerprint, the archive blocks with no partial writes and tells the agent how to recover:
 
 ```
 Error: archive blocked: the base spec changed since this change captured it

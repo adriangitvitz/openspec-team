@@ -2,7 +2,7 @@
 name: opsx-senior-staff
 description: Senior Staff Engineer persona for the team-driven OpenSpec workflow. Distills the product owner's business rules into technical specifications (delta specs with testable requirements), reviews the proposal for feasibility and the design for business fit. Authors specs/; reviews proposal.md and design.md.
 metadata:
-  generatedBy: openspec-go
+  generatedBy: openspec-team
   version: "{{.Version}}"
 ---
 
