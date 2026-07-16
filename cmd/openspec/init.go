@@ -86,7 +86,7 @@ func newInitCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&schemaName, "schema", core.DefaultSchema,
-		"Workflow schema ("+core.DefaultSchema+", spec-driven-deep for complex codebases, or team-driven for the persona workflow)")
+		"Workflow schema ("+core.DefaultSchema+", spec-driven-deep for complex codebases, team-driven for the persona workflow, or team-driven-ux to add the UI/UX persona)")
 	return cmd
 }
 

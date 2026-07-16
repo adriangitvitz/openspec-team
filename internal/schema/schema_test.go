@@ -127,7 +127,7 @@ func TestResolveSpecDrivenDeep(t *testing.T) {
 	if tmpl, err := s.TemplateContent(research); err != nil || len(tmpl) == 0 {
 		t.Fatalf("template err=%v", err)
 	}
-	if got := List(""); !reflect.DeepEqual(got, []string{"spec-driven", "spec-driven-deep", "team-driven"}) {
+	if got := List(""); !reflect.DeepEqual(got, []string{"spec-driven", "spec-driven-deep", "team-driven", "team-driven-ux"}) {
 		t.Fatalf("list = %v", got)
 	}
 }
@@ -200,6 +200,80 @@ func TestResolveTeamDriven(t *testing.T) {
 	for _, needle := range []string{"analysis or readiness question", "grounding from scratch"} {
 		if !strings.Contains(research.Instruction, needle) {
 			t.Errorf("research instruction missing %q", needle)
+		}
+	}
+	for _, a := range s.Artifacts {
+		if strings.Contains(a.Instruction, "ui-ux") {
+			t.Errorf("team-driven %s instruction names ui-ux", a.ID)
+		}
+	}
+}
+
+func TestResolveTeamDrivenUx(t *testing.T) {
+	s, err := Resolve("team-driven-ux", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	wantRequires := map[string][]string{
+		"research":    {},
+		"proposal":    {"research"},
+		"specs":       {"proposal"},
+		"design":      {"proposal"},
+		"test-matrix": {"specs"},
+		"ux-review":   {"specs", "design"},
+		"tasks":       {"design", "test-matrix", "ux-review"},
+	}
+	if len(s.Artifacts) != len(wantRequires) {
+		t.Fatalf("artifacts = %d, want %d", len(s.Artifacts), len(wantRequires))
+	}
+	for id, want := range wantRequires {
+		a, ok := s.Artifact(id)
+		if !ok {
+			t.Fatalf("missing artifact %s", id)
+		}
+		got := a.Requires
+		if got == nil {
+			got = []string{}
+		}
+		if !reflect.DeepEqual(got, want) {
+			t.Fatalf("%s.requires = %v, want %v", id, got, want)
+		}
+		if tmpl, err := s.TemplateContent(a); err != nil || len(tmpl) == 0 {
+			t.Fatalf("%s template err=%v", id, err)
+		}
+	}
+	if s.Apply == nil || !s.Apply.Traceability {
+		t.Fatal("team-driven-ux must opt into apply.traceability")
+	}
+
+	ux, _ := s.Artifact("ux-review")
+	for _, needle := range []string{
+		"ui-ux", "Design system", "Engagement mechanics", "Accessibility",
+		"Friction audit", "Findings against specs", "reflective-endorsement",
+		"WCAG 2.2 AA", "colorsenv", "foreground/background",
+	} {
+		if !strings.Contains(ux.Instruction, needle) {
+			t.Errorf("ux-review instruction missing %q", needle)
+		}
+	}
+	specs, _ := s.Artifact("specs")
+	if !strings.Contains(specs.Instruction, "ui-ux") || !strings.Contains(specs.Instruction, "friction") {
+		t.Error("specs instruction lacks the ui-ux reviewer seat")
+	}
+	design, _ := s.Artifact("design")
+	if !strings.Contains(design.Instruction, "ui-ux") || !strings.Contains(design.Instruction, "design-system fit") {
+		t.Error("design instruction lacks the ui-ux reviewer seat")
+	}
+	tasks, _ := s.Artifact("tasks")
+	for _, needle := range []string{"(req: ", "typosquat", "CVEs", "ux-review"} {
+		if !strings.Contains(tasks.Instruction, needle) {
+			t.Errorf("tasks instruction missing %q", needle)
+		}
+	}
+	for _, id := range []string{"proposal", "specs", "design"} {
+		a, _ := s.Artifact(id)
+		if !strings.Contains(a.Instruction, "two review rounds") {
+			t.Errorf("%s instruction lacks the bounded review protocol", id)
 		}
 	}
 }

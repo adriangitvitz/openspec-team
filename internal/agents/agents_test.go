@@ -16,7 +16,7 @@ func TestGenerateWritesAllFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(written) != 30 {
+	if len(written) != 31 {
 		t.Fatalf("written = %d files", len(written))
 	}
 
@@ -239,6 +239,109 @@ func TestAssetsCarryConfidentialBoundary(t *testing.T) {
 			if !strings.Contains(string(content), needle) {
 				t.Errorf("%s missing %q", rel, needle)
 			}
+		}
+	}
+}
+
+func TestAssetsCarryGroundingDiscipline(t *testing.T) {
+	root := t.TempDir()
+	if _, err := Generate(root, "1.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	for _, rel := range []string{
+		".claude/skills/openspec-team/SKILL.md",
+		".claude/commands/opsx/team.md",
+		".crush/commands/opsx/team.md",
+	} {
+		content, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(rel)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, needle := range []string{
+			"Source manifest",
+			"sources.md",
+			"confirm the list with the user",
+			"discrepancy to report, never an assumed source",
+			"coverage: sheets 3 of 3",
+			"enumerate every sheet or page",
+			"carries the source manifest section and its cited sources",
+			"confidential citations listed as withheld",
+			"duplicated task text are validation errors",
+		} {
+			if !strings.Contains(string(content), needle) {
+				t.Errorf("%s missing %q", rel, needle)
+			}
+		}
+	}
+	engineer, err := os.ReadFile(filepath.Join(root, ".claude", "agents", "opsx-senior-engineer.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, needle := range []string{
+		"Verify every task",
+		"already implemented",
+		"not derivable from a requirement",
+	} {
+		if !strings.Contains(string(engineer), needle) {
+			t.Errorf("senior-engineer missing %q", needle)
+		}
+	}
+}
+
+func TestAssetsCarryUxSchema(t *testing.T) {
+	root := t.TempDir()
+	if _, err := Generate(root, "1.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	for _, rel := range []string{
+		".claude/skills/openspec-team/SKILL.md",
+		".claude/commands/opsx/team.md",
+		".crush/commands/opsx/team.md",
+	} {
+		content, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(rel)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, needle := range []string{
+			"team-driven or team-driven-ux",
+			"say so and stop",
+			"ux-review (team-driven-ux only)",
+			"`ui-ux` (dispatched only on team-driven-ux)",
+			"ui-ux persona always keeps ux-review",
+		} {
+			if !strings.Contains(string(content), needle) {
+				t.Errorf("%s missing %q", rel, needle)
+			}
+		}
+	}
+}
+
+func TestUIUXAgentCarriesExpertise(t *testing.T) {
+	root := t.TempDir()
+	if _, err := Generate(root, "1.0.0"); err != nil {
+		t.Fatal(err)
+	}
+	content, err := os.ReadFile(filepath.Join(root, ".claude", "agents", "opsx-ui-ux.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, needle := range []string{
+		"Material 3", "Apple HIG", "Fluent", "Carbon", "Polaris", "Ant Design",
+		"token roles", "adopt vs\n   adapt vs build",
+		"internal-versus-external consistency",
+		"isomorphic",
+		"Hook Model", "B=MAP", "reflective-endorsement",
+		"Dark patterns", "findings, never suggestions",
+		"WCAG 2.2 AA", "keyboard-", "screen-reader", "COGA", "reach amplifier",
+		"Nielsen", "cognitive\n   walkthrough",
+		"computed, never estimated", "colorsenv",
+		"calculate_contrast_ratio", "generate_suitable_variations",
+		"report ratios as unverified",
+		"vanity metrics",
+		"named-organization sources",
+	} {
+		if !strings.Contains(string(content), needle) {
+			t.Errorf("opsx-ui-ux.md missing %q", needle)
 		}
 	}
 }

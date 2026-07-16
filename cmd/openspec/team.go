@@ -19,7 +19,7 @@ import (
 func newTeamCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "team",
-		Short: "Persona runner for the team-driven workflow",
+		Short: "Persona runner for the team-driven workflows",
 	}
 	cmd.AddCommand(newTeamPromptCmd(), newTeamRunCmd(), newTeamToolsCmd())
 	return cmd

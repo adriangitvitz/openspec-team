@@ -19,6 +19,7 @@ func TestTeamConfigValid(t *testing.T) {
 		Personas: map[string]core.PersonaConfig{
 			"product-owner":   {Runner: "openrouter", Model: "anthropic/claude-sonnet-4.5"},
 			"senior-engineer": {Runner: "claude"},
+			"ui-ux":           {Runner: "openrouter", Model: "x/y"},
 		},
 	}
 	if issues := TeamConfigIssues(root, team); len(issues) != 0 {

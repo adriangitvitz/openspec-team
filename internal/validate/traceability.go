@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/adriangitvitz/openspec-team/internal/parser"
@@ -16,10 +17,18 @@ import (
 var (
 	taskMarkerRe   = regexp.MustCompile(`\(req:\s*([^)]+)\)`)
 	whitespaceRuns = regexp.MustCompile(`\s+`)
+	checkboxRe     = regexp.MustCompile(`^\s*- \[[ xX]\]\s*(.*)$`)
+	taskNumberRe   = regexp.MustCompile(`^\d+(\.\d+)*\.?\s+`)
 )
 
 func normalizeMarkerName(name string) string {
 	return whitespaceRuns.ReplaceAllString(strings.TrimSpace(name), " ")
+}
+
+func normalizeTaskText(text string) string {
+	text = taskMarkerRe.ReplaceAllString(text, "")
+	text = taskNumberRe.ReplaceAllString(strings.TrimSpace(text), "")
+	return normalizeMarkerName(text)
 }
 
 // TaskTraceabilityForSchema runs the traceability rule only for schemas that opt in via apply.traceability.
@@ -34,11 +43,55 @@ func TaskTraceabilityForSchema(s *schema.Schema, changeDir string) []Issue {
 	return TaskTraceability(changeDir, tracked)
 }
 
-// TaskTraceability warns on delta requirements no task references and on markers matching no requirement.
+// TaskTraceability errors on markerless or duplicated checkbox task lines and
+// warns on unreferenced requirements and on markers matching no requirement.
 func TaskTraceability(changeDir, tasksFile string) []Issue {
 	tasksContent, err := os.ReadFile(filepath.Join(changeDir, tasksFile))
 	if err != nil {
 		return nil
+	}
+
+	var issues []Issue
+	duplicates := map[string][]int{}
+	var duplicateOrder []string
+	for i, line := range strings.Split(string(tasksContent), "\n") {
+		m := checkboxRe.FindStringSubmatch(line)
+		if m == nil {
+			continue
+		}
+		text := m[1]
+		if !taskMarkerRe.MatchString(text) {
+			issues = append(issues, Issue{
+				Level: Error,
+				Path:  "task-traceability",
+				Message: fmt.Sprintf("task on line %d has no (req: <requirement name>) marker: %s",
+					i+1, strings.TrimSpace(text)),
+			})
+		}
+		norm := normalizeTaskText(text)
+		if norm == "" {
+			continue
+		}
+		if _, seen := duplicates[norm]; !seen {
+			duplicateOrder = append(duplicateOrder, norm)
+		}
+		duplicates[norm] = append(duplicates[norm], i+1)
+	}
+	for _, norm := range duplicateOrder {
+		lines := duplicates[norm]
+		if len(lines) < 2 {
+			continue
+		}
+		parts := make([]string, len(lines))
+		for j, n := range lines {
+			parts[j] = strconv.Itoa(n)
+		}
+		issues = append(issues, Issue{
+			Level: Error,
+			Path:  "task-traceability",
+			Message: fmt.Sprintf("task text %q is duplicated on lines %s",
+				norm, strings.Join(parts, ", ")),
+		})
 	}
 
 	referenced := map[string]bool{}
@@ -77,7 +130,6 @@ func TaskTraceability(changeDir, tasksFile string) []Issue {
 		}
 	}
 
-	var issues []Issue
 	for _, req := range requirements {
 		if !referenced[req.name] {
 			issues = append(issues, Issue{

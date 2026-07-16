@@ -43,14 +43,14 @@ openspec init
 
 - `.claude/skills/openspec-{propose,explore,apply-change,update-change,sync-specs,verify-change,archive-change,team}/SKILL.md`
 - `.claude/commands/opsx/{propose,explore,apply,update,sync,verify,archive,team}.md`
-- `.claude/agents/opsx-{product-owner,senior-staff,senior-engineer,backend-dev,frontend-dev,qa}.md`, the persona agents for the team-driven workflow
+- `.claude/agents/opsx-{product-owner,senior-staff,senior-engineer,backend-dev,frontend-dev,qa,ui-ux}.md`, the persona agents for the team-driven workflows
 - `.crush/commands/opsx/*.md`, the same commands for [Crush](https://github.com/charmbracelet/crush), invoked as `project:opsx:<name>`; Crush picks up the skills from `.claude/skills` natively
 
 Then talk to your agent: `/opsx:explore` to think an idea through, `/opsx:propose add-dark-mode` to plan it, `/opsx:apply` to implement, `/opsx:archive` to merge the specs and file the change away.
 
 ## Team-driven workflow
 
-`--schema team-driven` turns a change into a virtual team process. Each artifact has a persona author and adversarial reviewers; the user approves at a human gate after each phase:
+`--schema team-driven` turns a change into a virtual team process (`--schema team-driven-ux` for changes with a user interface). Each artifact has a persona author and adversarial reviewers; the user approves at a human gate after each phase:
 
 | Phase | Artifacts | Author -> Reviewers |
 |---|---|---|
@@ -58,7 +58,13 @@ Then talk to your agent: `/opsx:explore` to think an idea through, `/opsx:propos
 | 2. Technical design | specs, design, test-matrix | senior-staff -> senior-engineer + qa; senior-engineer -> senior-staff; qa |
 | 3. Planning | tasks | backend-dev + frontend-dev -> senior-engineer |
 
-Reviewers return findings (severity plus file-path evidence, at most two revision rounds). The QA persona derives a test matrix from the delta-spec scenarios, or analyzes coverage against one you reference. Tasks carry `(req: <requirement name>)` markers that `openspec validate` checks: every requirement needs a task, every marker needs a requirement. Drive it with `/opsx:team`.
+Reviewers return findings (severity plus file-path evidence, at most two revision rounds). The QA persona derives a test matrix from the delta-spec scenarios, or analyzes coverage against one you reference. Tasks carry `(req: <requirement name>)` markers that `openspec validate` checks: every requirement needs a task, every marker needs a requirement, and checkbox tasks without a marker or with duplicated text are validation errors. Drive it with `/opsx:team`.
+
+### UI/UX variant (team-driven-ux)
+
+`team-driven-ux` adds a seventh persona, `ui-ux`: an expert in design systems (Material 3, Apple HIG, Fluent 2, Carbon, Polaris, Ant Design and the design-to-token-roles discipline), behavioral design for engagement bounded by an explicit ethics line (dark patterns are findings, not suggestions), accessibility beyond automated scanners (WCAG 2.2 AA, keyboard-only and screen-reader walkthroughs, COGA), and friction auditing (Nielsen heuristics, cognitive walkthroughs). It reviews specs and design, and authors a phase-2 `ux-review.md`: design-system recommendation, engagement-mechanics assessment, accessibility mapping, and friction audit; tasks then require the ux-review so remediations become traced work. Contrast ratios are computed with the project's color toolkit, never estimated: [colorsenv](https://github.com/adriangitvitz/colorsenv) is the reference (WCAG contrast ratios, compliant variant generation, stdlib-only Python); register your local checkout through the project's knowledge map or context so the persona finds it. Pick team-driven for backend or CLI work, team-driven-ux when a user touches the result.
+
+At intake the workflow builds a source manifest: `sources.md` in the change directory lists every user-provided source file (backticked path, sha256, extraction status), confirmed with the user before the first persona dispatch. Prompt assembly renders the manifest as its own section and inlines its citations, so client files mechanically reach every persona; a file referenced by code but absent from the manifest is reported as a discrepancy instead of assumed.
 
 Per-persona execution is configured in `openspec/config.yaml`:
 
@@ -114,7 +120,7 @@ openspec team tools [--json]
 
 ### Binary documents (PDF, docx, xlsx, pptx)
 
-Binary sources are consumed through sibling extractions: `docs/EF.pdf` is inlined via `docs/EF.pdf.md`, written once by the orchestrating harness (Claude Code parses PDFs natively; the CLI never parses binaries) with a provenance header carrying the source's content hash. The bundle flags stale extractions when the source's bytes change. Documents without a sibling appear under "needs extraction" in the bundle, and `read_file` refuses binary documents, redirecting to the sibling or `request_extraction`. When an external model needs deeper detail, `request_extraction` pauses the run (exit code 7, JSON needs payload on stdout, persisted to `extraction-needs.json` in the change directory); the harness fulfills the request and re-runs, capped at 2 round-trips per persona and artifact. Documents matching `team.confidential` are exempt from all of this on external runs: they surface as withheld, and `request_extraction` on them errors in-run (never pauses) so a harness is never invited to extract one on an external persona's behalf.
+Binary sources are consumed through sibling extractions: `docs/EF.pdf` is inlined via `docs/EF.pdf.md`, written once by the orchestrating harness (Claude Code parses PDFs natively; the CLI never parses binaries) with a provenance header carrying the source's content hash and a `coverage` field (`<!-- coverage: sheets 2 of 5 -->`). The bundle flags stale extractions when the source's bytes change, and flags partial extractions when coverage records fewer sheets or pages than the document holds. Documents without a sibling appear under "needs extraction" in the bundle, and `read_file` refuses binary documents, redirecting to the sibling or `request_extraction`. When an external model needs deeper detail, `request_extraction` pauses the run (exit code 7, JSON needs payload on stdout, persisted to `extraction-needs.json` in the change directory); the harness fulfills the request and re-runs, capped at 2 round-trips per persona and artifact. Documents matching `team.confidential` are exempt from all of this on external runs: they surface as withheld, and `request_extraction` on them errors in-run (never pauses) so a harness is never invited to extract one on an external persona's behalf.
 
 ## Spec format
 

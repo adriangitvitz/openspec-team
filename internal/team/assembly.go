@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/adriangitvitz/openspec-team/internal/agents"
@@ -30,6 +31,8 @@ var binaryDocExts = map[string]bool{".pdf": true, ".docx": true, ".xlsx": true, 
 // sourceHashRe matches the provenance source-sha256 header; content hashes (not mtimes) are the only git-safe staleness signal.
 var sourceHashRe = regexp.MustCompile(`(?i)<!--\s*source-sha256:\s*([0-9a-fA-F]{64})\s*-->`)
 
+var coverageRe = regexp.MustCompile(`(?i)<!--\s*coverage:\s*([a-z]+)\s+(\d+)\s+of\s+(\d+)\s*-->`)
+
 // provenanceHeaderCap bounds the header read; provenance lives in the file's first bytes.
 const provenanceHeaderCap = 4096
 
@@ -40,6 +43,7 @@ type EvidenceFile struct {
 	Truncated    bool   `json:"truncated"`
 	ExtractionOf string `json:"extractionOf,omitempty"`
 	Stale        bool   `json:"stale,omitempty"`
+	Coverage     string `json:"coverage,omitempty"`
 }
 
 // Bundle is the evidence bundle: inlined files, unresolved citations, binary
@@ -60,13 +64,14 @@ type DependencyContent struct {
 
 // Assembly is the full persona × artifact prompt package.
 type Assembly struct {
-	Persona      string                       `json:"persona"`
-	ArtifactID   string                       `json:"artifactId"`
-	ChangeName   string                       `json:"changeName"`
-	SystemPrompt string                       `json:"systemPrompt"`
-	Brief        *change.ArtifactInstructions `json:"brief"`
-	Dependencies []DependencyContent          `json:"dependencies"`
-	Evidence     Bundle                       `json:"evidence"`
+	Persona        string                       `json:"persona"`
+	ArtifactID     string                       `json:"artifactId"`
+	ChangeName     string                       `json:"changeName"`
+	SystemPrompt   string                       `json:"systemPrompt"`
+	Brief          *change.ArtifactInstructions `json:"brief"`
+	Dependencies   []DependencyContent          `json:"dependencies"`
+	SourceManifest string                       `json:"sourceManifest,omitempty"`
+	Evidence       Bundle                       `json:"evidence"`
 }
 
 // Assemble builds the deterministic prompt package for one persona and one
@@ -127,14 +132,20 @@ func Assemble(ctx *change.Context, persona, artifactID string) (*Assembly, error
 		}
 	}
 
+	manifest := ""
+	if content, err := os.ReadFile(filepath.Join(ctx.ChangeDir, "sources.md")); err == nil {
+		manifest = string(content)
+	}
+
 	return &Assembly{
-		Persona:      persona,
-		ArtifactID:   artifactID,
-		ChangeName:   ctx.ChangeName,
-		SystemPrompt: systemPrompt,
-		Brief:        brief,
-		Dependencies: deps,
-		Evidence:     buildBundle(ctx.Root, ctx.ChangeDir, deps, confidential),
+		Persona:        persona,
+		ArtifactID:     artifactID,
+		ChangeName:     ctx.ChangeName,
+		SystemPrompt:   systemPrompt,
+		Brief:          brief,
+		Dependencies:   deps,
+		SourceManifest: manifest,
+		Evidence:       buildBundle(ctx.Root, ctx.ChangeDir, manifest, deps, confidential),
 	}, nil
 }
 
@@ -151,14 +162,24 @@ func isCitation(token string) bool {
 	return strings.Contains(token, "/") || strings.Contains(path.Base(token), ".")
 }
 
-// buildBundle resolves citations change-dir-first, then root; confidential matches are withheld (path listed, content absent, no budget spent).
-func buildBundle(root, changeDir string, deps []DependencyContent, confidential []string) Bundle {
+// buildBundle resolves citations change-dir-first, then root; the manifest is
+// scanned before dependencies so client sources claim the budget first, and
+// confidential matches are withheld (path listed, content absent, no budget spent).
+func buildBundle(root, changeDir, manifest string, deps []DependencyContent, confidential []string) Bundle {
 	var bundle Bundle
 	seen := map[string]bool{}
 	remaining := totalBudget
 
+	contents := make([]string, 0, len(deps)+1)
+	if manifest != "" {
+		contents = append(contents, manifest)
+	}
 	for _, dep := range deps {
-		for _, m := range backtickRe.FindAllStringSubmatch(dep.Content, -1) {
+		contents = append(contents, dep.Content)
+	}
+
+	for _, content := range contents {
+		for _, m := range backtickRe.FindAllStringSubmatch(content, -1) {
 			token := m[1]
 			if seen[token] || !isCitation(token) {
 				continue
@@ -188,6 +209,7 @@ func buildBundle(root, changeDir string, deps []DependencyContent, confidential 
 					f := inlineFile(sibling, sibToken, &remaining)
 					f.ExtractionOf = token
 					f.Stale = extractionIsStale(sibling, full)
+					f.Coverage = extractionCoverage(sibling)
 					bundle.Files = append(bundle.Files, f)
 				} else {
 					bundle.NeedsExtraction = append(bundle.NeedsExtraction, token)
@@ -200,16 +222,20 @@ func buildBundle(root, changeDir string, deps []DependencyContent, confidential 
 	return bundle
 }
 
-// extractionIsStale reads the provenance header from the sibling file itself (bundle truncation cannot hide it); siblings without the hash skip the check.
-func extractionIsStale(siblingPath, sourcePath string) bool {
-	f, err := os.Open(siblingPath)
+func provenanceHeader(path string) []byte {
+	f, err := os.Open(path)
 	if err != nil {
-		return false
+		return nil
 	}
+	defer f.Close()
 	head := make([]byte, provenanceHeaderCap)
 	n, _ := io.ReadFull(f, head)
-	f.Close()
-	m := sourceHashRe.FindSubmatch(head[:n])
+	return head[:n]
+}
+
+// extractionIsStale reads the provenance header from the sibling file itself (bundle truncation cannot hide it); siblings without the hash skip the check.
+func extractionIsStale(siblingPath, sourcePath string) bool {
+	m := sourceHashRe.FindSubmatch(provenanceHeader(siblingPath))
 	if m == nil {
 		return false
 	}
@@ -219,6 +245,22 @@ func extractionIsStale(siblingPath, sourcePath string) bool {
 	}
 	current := fmt.Sprintf("%x", sha256.Sum256(source))
 	return current != strings.ToLower(string(m[1]))
+}
+
+// extractionCoverage returns "<unit> <extracted> of <total>" when the sibling's
+// provenance header records partial coverage; empty otherwise (fully covered,
+// absent, or unparseable — no signal beats a wrong one).
+func extractionCoverage(siblingPath string) string {
+	m := coverageRe.FindSubmatch(provenanceHeader(siblingPath))
+	if m == nil {
+		return ""
+	}
+	extracted, err1 := strconv.Atoi(string(m[2]))
+	total, err2 := strconv.Atoi(string(m[3]))
+	if err1 != nil || err2 != nil || extracted >= total {
+		return ""
+	}
+	return fmt.Sprintf("%s %d of %d", strings.ToLower(string(m[1])), extracted, total)
 }
 
 // resolveCitation tries each base with the tool loop's symlink-safe containment and returns the first regular file.
@@ -274,6 +316,9 @@ func Render(a *Assembly) string {
 	for _, dep := range a.Dependencies {
 		fmt.Fprintf(&b, "\n## Dependency artifact: %s (%s)\n\n%s\n", dep.ArtifactID, dep.Path, strings.TrimSpace(dep.Content))
 	}
+	if a.SourceManifest != "" {
+		fmt.Fprintf(&b, "\n## Source manifest\n\nThe user-provided source files for this change. Trace every file-inventory claim to this list; a file referenced elsewhere but absent here is a discrepancy to report, never an assumed source.\n\n%s\n", strings.TrimSpace(a.SourceManifest))
+	}
 	if len(a.Evidence.Files) > 0 || len(a.Evidence.Unresolved) > 0 || len(a.Evidence.NeedsExtraction) > 0 || len(a.Evidence.Withheld) > 0 {
 		b.WriteString("\n## Evidence bundle\n")
 		b.WriteString("\nCited files inlined below. Verify claims against them.\n")
@@ -284,6 +329,9 @@ func Render(a *Assembly) string {
 			}
 			if f.Stale {
 				fmt.Fprintf(&b, "[stale extraction: %s was modified after this extraction was taken]\n", f.ExtractionOf)
+			}
+			if f.Coverage != "" {
+				fmt.Fprintf(&b, "[partial extraction: covers %s — treat the missing portion as a gap, not as absent content]\n", f.Coverage)
 			}
 			fmt.Fprintf(&b, "```\n%s\n```\n", f.Content)
 			if f.Truncated {

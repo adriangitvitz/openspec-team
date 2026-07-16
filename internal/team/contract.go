@@ -63,7 +63,7 @@ func IntegrationContract() Contract {
 	c.NeedsProtocol.NeedsFile = NeedsFileName + " in the change directory; pending requests are cleared by the next successful run of the same persona and artifact, round-trip counts are retained; the file is removed when nothing remains"
 	c.NeedsProtocol.Fulfillment = []string{
 		"read the needs payload (stdout or the needs file)",
-		"for each request, extract the asked detail from the source document and write or refine its sibling extraction <name>.<ext>.md with a provenance header (source path, source-sha256 content hash, source-modified time, extraction date, section/page markers)",
+		"for each request, extract the asked detail from the source document and write or refine its sibling extraction <name>.<ext>.md with a provenance header (source path, source-sha256 content hash, source-modified time, extraction date, section/page markers, coverage as '<unit> <extracted> of <total>' — enumerate every sheet or page and record coverage honestly; the bundle flags partial extractions)",
 		"re-run the same `openspec team run` invocation; the evidence bundle now carries the extraction",
 		"if the harness cannot parse the document, surface the request to a human instead of fabricating an extraction",
 	}

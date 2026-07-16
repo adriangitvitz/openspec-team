@@ -1,11 +1,9 @@
-# NOTE: artifact instructions and templates mirror spec-driven-deep with
-# persona additions, and team-driven-ux mirrors this file with UX additions;
-# there is no cross-schema template lookup, so fixes to spec-driven-deep must
-# be mirrored here manually (and vice versa), and fixes here must be mirrored
-# into team-driven-ux.
-name: team-driven
+# NOTE: artifact instructions and templates mirror team-driven with UX
+# additions; there is no cross-schema template lookup, so fixes to
+# team-driven must be mirrored here manually (and vice versa).
+name: team-driven-ux
 version: 1
-description: Persona-driven OpenSpec workflow - a virtual team (product owner, senior staff, senior engineer, developers, QA) authors and reviews each artifact, with human gates between phases
+description: Persona-driven OpenSpec workflow with a UI/UX expert - the team-driven virtual team plus a ui-ux persona that authors a ux-review artifact and reviews specs and design for accessibility, friction, engagement ethics, and design-system fit
 artifacts:
   - id: research
     generates: research.md
@@ -102,8 +100,11 @@ artifacts:
     instruction: |
       PERSONA - Author: senior-staff (translates the proposal's business
       rules into technical requirements). Reviewers: senior-engineer (design
-      soundness) and qa (testability - every scenario must be concrete and
-      verifiable).
+      soundness), qa (testability - every scenario must be concrete and
+      verifiable), and ui-ux (accessibility and friction blind spots -
+      user-facing requirements must be perceivable, operable, and specified
+      without friction traps; missing accessibility requirements are
+      findings).
 
       Review protocol: each reviewer returns findings - severity
       (critical/major/minor), a one-line claim, file-path evidence. The
@@ -149,10 +150,11 @@ artifacts:
     template: design.md
     instruction: |
       PERSONA - Author: senior-engineer (evaluates technology and code
-      options, records what the product needs and why). Reviewer:
-      senior-staff (does the design serve the business spec?).
+      options, records what the product needs and why). Reviewers:
+      senior-staff (does the design serve the business spec?) and ui-ux
+      (design-system fit and platform-idiom consistency).
 
-      Review protocol: the reviewer returns findings - severity
+      Review protocol: each reviewer returns findings - severity
       (critical/major/minor), a one-line claim, file-path evidence. The
       author revises. At most two review rounds; unresolved findings go to
       the human gate as open questions.
@@ -207,6 +209,51 @@ artifacts:
       Test tasks planned later (tasks.md) must trace back to matrix rows.
     requires:
       - specs
+
+  - id: ux-review
+    generates: ux-review.md
+    description: UX review - design-system assessment, engagement ethics, accessibility mapping, and friction audit
+    template: ux-review.md
+    instruction: |
+      PERSONA - Author: ui-ux. No agent reviewer; the technical-design-phase
+      human gate reviews this artifact together with specs, design, and the
+      test matrix.
+
+      Audit the planned product experience. You review decisions already
+      made in specs and design - you do not invent new scope.
+
+      Sections:
+      - **Design system**: recommend the design language with adopt/adapt/
+        build trade-offs stated, the platform-idiom cost named explicitly
+        (internal vs external consistency), and the token-role discipline
+        (design to named token roles, never raw values).
+      - **Engagement mechanics**: map each mechanic the design relies on to
+        its behavioral mechanism (trigger, variable reward, investment,
+        loss aversion, endowed progress) and test it against the
+        reflective-endorsement line - would the user, knowing how the
+        choice was engineered, endorse it afterward? Dark patterns are
+        findings, never suggestions.
+      - **Accessibility**: map every user-facing flow against WCAG 2.2 AA,
+        plan the manual checks automated scanners cannot run (keyboard-only
+        walkthrough, screen-reader pass, 200% zoom and reflow, reduced
+        motion, real-device touch targets), and key severities to
+        assistive-technology task-blocking with the reach amplifier (a
+        low-severity issue on every page or on a top-task page escalates a
+        tier). Contrast ratios are computed with the project's color
+        toolkit (reference: colorsenv) - every stated ratio names its
+        foreground/background pair and computed value, ratios never
+        estimated, and failing colors get toolkit-generated compliant
+        alternatives.
+      - **Friction audit**: walk the planned user journeys with Nielsen's
+        heuristics and 0-4 severity, distinguishing good friction
+        (proportional, transparent, value-aligned) from bad (arbitrary,
+        opaque, serving a metric at the user's expense).
+      - **Findings against specs**: untestable or missing accessibility and
+        flow requirements are findings - severity, one-line claim,
+        file-path evidence - so the specs author fixes them.
+    requires:
+      - specs
+      - design
 
   - id: tasks
     generates: tasks.md
@@ -268,10 +315,12 @@ artifacts:
       ```
 
       Reference specs for what needs to be built, design for how to build it,
-      and the test matrix for what must be verified.
+      the test matrix for what must be verified, and the ux-review for the
+      accessibility and friction remediations that must become traced tasks.
     requires:
       - design
       - test-matrix
+      - ux-review
 
 apply:
   requires: [tasks]

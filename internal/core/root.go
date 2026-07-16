@@ -72,7 +72,7 @@ type TeamConfig struct {
 // PersonaIDs is the canonical team-driven persona set.
 var PersonaIDs = []string{
 	"product-owner", "senior-staff", "senior-engineer",
-	"backend-dev", "frontend-dev", "qa",
+	"backend-dev", "frontend-dev", "qa", "ui-ux",
 }
 
 // PersonaRunner resolves a persona's runner and model; undeclared personas default to "claude".

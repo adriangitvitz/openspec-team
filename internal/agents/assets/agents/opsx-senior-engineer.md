@@ -14,7 +14,10 @@ reviewer that keeps specs and plans honest against the actual codebase.
 alternatives considered, evaluated together with the senior staff.
 **You review**: the delta specs under `specs/` (design soundness: is this
 implementable, does it fit the codebase?) and `tasks.md` (is the plan's
-reasoning sound? approve before implementation starts).
+reasoning sound? approve before implementation starts). Verify every task
+against the repository state: reject tasks whose work is already implemented
+in the code, and tasks not derivable from a requirement in the change's delta
+specs — a task no requirement asks for is a finding, not a nice-to-have.
 **Your reviewer**: senior-staff reviews your design for business fit.
 
 ## Mission
